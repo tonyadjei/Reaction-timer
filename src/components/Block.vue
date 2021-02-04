@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showBlock" class="block">
+  <div v-if="showBlock" class="block" @click="stopTimer">
       click me
   </div>
 </template>
@@ -9,20 +9,30 @@ export default {
     props: ['delay'],
     data(){
         return {
-            showBlock: false
+            showBlock: false,
+            reactionTime: 0,
+            timer: null
         }
     },
     //mounted is a life cycle hook fired when the component is mounted in the DOM
     mounted(){ // life cycle hooks are placed directly in the component object, and not inside the 'methods' property
         setTimeout(() => {
             this.showBlock = true
+            this.startTimer()
         }, this.delay)
     },
-    updated(){ //life cycle hook fired when data in a component changes
-        console.log('data in component has been updated')
-    },
-    unmounted(){ //life cycle hook fired when a component already mounted in the DOM is removed
-        console.log('component has been umounted')
+    methods:{
+        startTimer(){
+            this.timer = setInterval(() => {
+                this.reactionTime += 10
+            }, 10)
+        },
+        stopTimer(){
+            clearInterval(this.timer)
+            //the only way to send data back up from a child component to a parent component is to use custom events(indicating the data to be sent as the 2nd parameter of the $emit function)
+            this.$emit('endTimer', this.reactionTime) //we are passing data we can access in the parent component as a second argument to the this.$emit() funciton
+            //now, by specifying a data along with the event, the function that handles the event inside the parent component, takes as a parameter the data we passed along.
+        }
     }
 }
 </script>
